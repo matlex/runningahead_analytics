@@ -8,6 +8,7 @@ Code to retrieve analytics
 * Repeat previous command each time you want to check and add new records
 
 ##Notes:
+Create new "settings" directory in program root folder.
 Add into settings directory following files:
 * access_tokens.json
 * Analytics Code-d9b5f2ff02e5.json

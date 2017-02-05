@@ -56,3 +56,4 @@ cookies.json
 /static
 /media
 local_settings_and_secrets.json
+/settings/*

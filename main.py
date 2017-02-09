@@ -158,25 +158,28 @@ def main():
     logger.info("Program started.")
     print "Program started."
     # Processing Runningahead Data
-    runningahead_handler = RunningAheadHandler()
-    last_runningahead_workout = runningahead_handler.get_most_recent_workout_data()[0]
-    last_runningahead_workout_date = runningahead_handler.get_date_from_workout_data(last_runningahead_workout)
-    last_runningahead_workout_date = transorfm_date_format(last_runningahead_workout_date)
+    try:
+        runningahead_handler = RunningAheadHandler()
+        last_runningahead_workout = runningahead_handler.get_most_recent_workout_data()[0]
+        last_runningahead_workout_date = runningahead_handler.get_date_from_workout_data(last_runningahead_workout)
+        last_runningahead_workout_date = transorfm_date_format(last_runningahead_workout_date)
 
-    # Processing Google Spreadsheet
-    spreadhseet_handler = GoogleSpreadsheetHandler()
-    excel_last_row_num = spreadhseet_handler.get_last_row_num_in_sheet()
-    excel_last_row_date = spreadhseet_handler.get_last_row_date(excel_last_row_num)
+        # Processing Google Spreadsheet
+        spreadhseet_handler = GoogleSpreadsheetHandler()
+        excel_last_row_num = spreadhseet_handler.get_last_row_num_in_sheet()
+        excel_last_row_date = spreadhseet_handler.get_last_row_date(excel_last_row_num)
 
-    if last_runningahead_workout_date != excel_last_row_date:
-        print "Adding a new record into spreadsheet."
-        logger.info("Adding a new record into spreadsheet.")
-        spreadhseet_handler.append_workout_data_to_sheet(last_runningahead_workout, excel_last_row_num)
-        print "New record successfully added to google spreadsheet."
-        logger.info("New record successfully added to google spreadsheet.")
-    else:
-        print "There is no new records from runningahead api."
-        logger.info("There is no new records from runningahead api.")
+        if last_runningahead_workout_date != excel_last_row_date:
+            print "Adding a new record into spreadsheet."
+            logger.info("Adding a new record into spreadsheet.")
+            spreadhseet_handler.append_workout_data_to_sheet(last_runningahead_workout, excel_last_row_num)
+            print "New record successfully added to google spreadsheet."
+            logger.info("New record successfully added to google spreadsheet.")
+        else:
+            print "There is no new records from runningahead api."
+            logger.info("There is no new records from runningahead api.")
+    except Exception as e:
+        logger.info(e)
 
     print "Finished"
     logger.info("Program finished.")

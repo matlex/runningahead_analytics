@@ -46,9 +46,10 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
-# Matvey
+# Other custom stuff
 output.csv
 cookies.json
+*.sh
 
 # Django stuff:
 *.log

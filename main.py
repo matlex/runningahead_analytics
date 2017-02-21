@@ -50,7 +50,7 @@ class RunningAheadHandler:
     def __init__(self):
         self.payload = {
             'access_token': get_secret('mathias_account'),
-            'fields': [10, 11, 12, 13, 20, 21]
+            'fields': [10, 11, 12, 13, 20, 21, 22]
         }
 
     def get_workouts_list(self):
@@ -71,6 +71,7 @@ class RunningAheadHandler:
             timeout=(20, 20)
         )
         # print json.dumps(response.json(), indent=4)  # Debug
+        # raw_input()
         return response.json()['data']['entries']
 
     def get_date_from_workout_data(self, workout_data):
@@ -113,6 +114,7 @@ class GoogleSpreadsheetHandler:
         D - Time of Day
         E - Distance
         F - Duration
+        G - Course name
         :param wkdata:
         :param last_row_num: - in case of...
         :return:
@@ -147,6 +149,11 @@ class GoogleSpreadsheetHandler:
         try:
             seconds_src = wkdata['details']['duration']
             new_row_to_add.append(self.convert_seconds_to_hms(self, seconds_src))
+        except KeyError:
+            new_row_to_add.append('')
+        # Course name
+        try:
+            new_row_to_add.append(wkdata['course']['name'])
         except KeyError:
             new_row_to_add.append('')
 

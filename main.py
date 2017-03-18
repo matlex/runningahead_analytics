@@ -70,12 +70,15 @@ class RunningAheadHandler:
             params=self.payload,
             timeout=(20, 20)
         )
-        # print json.dumps(response.json(), indent=4)  # Debug
+        # print json.dumps(response.json())  # Debug
         # raw_input()
         return response.json()['data']['entries']
 
     def get_date_from_workout_data(self, workout_data):
         return workout_data['date']
+
+    def get_activity_id_from_workout(self, workout_data):
+        return workout_data['id']
 
 
 # Google spreadsheets handler
@@ -101,9 +104,10 @@ class GoogleSpreadsheetHandler:
         list_of_lists = self.worksheet.get_all_values()
         return len(list_of_lists)
 
-    def get_last_row_date(self, last_row_num):
+    def get_last_row_date_and_id(self, last_row_num):
         last_row_date = self.worksheet.cell(last_row_num, 1).value
-        return last_row_date
+        last_row_id = self.worksheet.cell(last_row_num, 8).value
+        return last_row_date, last_row_id
 
     def append_workout_data_to_sheet(self, wkdata, last_row_num):
         """
@@ -156,7 +160,11 @@ class GoogleSpreadsheetHandler:
             new_row_to_add.append(wkdata['course']['name'])
         except KeyError:
             new_row_to_add.append('')
-
+        # Activity ID
+        try:
+            new_row_to_add.append(wkdata['id'])
+        except KeyError:
+            new_row_to_add.append('')
         self.worksheet.append_row(new_row_to_add)
 
 
@@ -170,13 +178,15 @@ def main():
         last_runningahead_workout = runningahead_handler.get_most_recent_workout_data()[0]
         last_runningahead_workout_date = runningahead_handler.get_date_from_workout_data(last_runningahead_workout)
         last_runningahead_workout_date = transorfm_date_format(last_runningahead_workout_date)
+        last_runningahead_workout_id = runningahead_handler.get_activity_id_from_workout(last_runningahead_workout)
 
         # Processing Google Spreadsheet
         spreadhseet_handler = GoogleSpreadsheetHandler()
         excel_last_row_num = spreadhseet_handler.get_last_row_num_in_sheet()
-        excel_last_row_date = spreadhseet_handler.get_last_row_date(excel_last_row_num)
+        excel_last_row_date, excel_last_row_id = spreadhseet_handler.get_last_row_date_and_id(excel_last_row_num)
 
-        if last_runningahead_workout_date != excel_last_row_date:
+        if last_runningahead_workout_date != excel_last_row_date or \
+                (last_runningahead_workout_date == excel_last_row_date and last_runningahead_workout_id != excel_last_row_id):
             print "Adding a new record into spreadsheet."
             logger.info("Adding a new record into spreadsheet.")
             spreadhseet_handler.append_workout_data_to_sheet(last_runningahead_workout, excel_last_row_num)
